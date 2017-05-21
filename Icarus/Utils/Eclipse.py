@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE
-from __future__ import print_function, division
+
 
 import os
 
@@ -404,7 +404,7 @@ def Occultation_shapely(vertices, faces_ind, incl, orbph, q, ntheta, radii):
     x_back, y_back = Observer_2Dprojection(vertices[0], vertices[1], vertices[2], incl, orbph, xoffset=q/(1.+q))
     x_back = x_back[faces_ind]
     y_back = y_back[faces_ind]
-    faces = np.array([shapely.geometry.Polygon(zip(*xy)) for xy in zip(x_back,y_back)])
+    faces = np.array([shapely.geometry.Polygon(list(zip(*xy))) for xy in zip(x_back,y_back)])
     T.append(time.time())
     #print( "T{}: {} ({})".format(len(T), T[-1]-T[0], T[-1]-T[-2]) )
 

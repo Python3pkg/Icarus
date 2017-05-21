@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE
-from __future__ import print_function, division
+
 
 __all__ = ["Spectroscopy", "Doppler_shift", "Normalize_spectrum", "Rebin", "Process_flux", "Process_flux1"]
 
@@ -86,7 +86,7 @@ class Spectroscopy(object):
         if atmo_grid is None:
             self.atmo_grid = None
         ## If a string is provided, this is the file containing the info about the atmosphere grid
-        elif isinstance(atmo_grid, basestring):
+        elif isinstance(atmo_grid, str):
             self.__Read_atmo(atmo_grid)
         ## One might provide an atmosphere grid object directly
         else:
@@ -118,7 +118,7 @@ class Spectroscopy(object):
             v = [0.]*self.ndataset
         if inds is None:
             inds = np.arange(self.ndataset)
-        fluxes, chi2 = zip(*[ Process_flux(self.data['flux'][i], self.data['err'][i], flux_model[i], self.data['wavelength'][i], self.atmo_grid.wav, z=v[i]/cts.c) for i in inds ])
+        fluxes, chi2 = list(zip(*[ Process_flux(self.data['flux'][i], self.data['err'][i], flux_model[i], self.data['wavelength'][i], self.atmo_grid.wav, z=v[i]/cts.c) for i in inds ]))
         return fluxes, chi2
 
     def Get_flux(self, par, orbph=None, velocities=0., gravscale=None, atmo_grid=None, verbose=False):
@@ -290,7 +290,7 @@ class Spectroscopy(object):
             split_ratio = 0.0
         w = (wlim - (panels[0]-1)*colspace)/panels[0]
         h = (hlim - (panels[1]-1)*rowspace)/panels[1]
-        for i in xrange(len(inds)):
+        for i in range(len(inds)):
             if i%(panels[0]*panels[1]) == 0:
                 fig.clf()
             col = (i%(panels[0]*panels[1]))/panels[1]
@@ -314,7 +314,7 @@ class Spectroscopy(object):
                 ax.set_xlim([wav_obs[i][0],wav_obs[i][-1]])
             if (i+1)%(panels[0]*panels[1]) == 0:
                 pylab.draw()
-                raw_input("Press enter to move to the next plot")
+                input("Press enter to move to the next plot")
             elif i == len(inds)-1:
                 pylab.draw()
         return
@@ -343,14 +343,14 @@ class Spectroscopy(object):
         else:
             fig = pylab.gcf()
         if panels is None:
-            for i in xrange(len(inds)):
+            for i in range(len(inds)):
                 fig.clf()
                 ax1 = fig.add_axes([0.05,0.05,0.92,0.93])
                 ax1.plot(wave_obs[i], flux_obs[i], 'k-')
                 ax1.set_xlim([wave_obs[i][0],wave_obs[i][-1]])
                 ax1.text(0.03, 0.90, "{}: {}".format(self.data['id'][inds[i]], self.data['phase'][inds[i]]), transform=ax1.transAxes, bbox={'facecolor':'w'})
                 pylab.draw()
-                raw_input("Press enter to move to the next plot")
+                input("Press enter to move to the next plot")
         else:
             llim = 0.05
             blim = 0.05
@@ -361,7 +361,7 @@ class Spectroscopy(object):
             split_ratio = 0.3
             w = (wlim - (panels[0]-1)*colspace)/panels[0]
             h = (hlim - (panels[1]-1)*rowspace)/panels[1]
-            for i in xrange(len(inds)):
+            for i in range(len(inds)):
                 if i%(panels[0]*panels[1]) == 0:
                     fig.clf()
                 col = (i%(panels[0]*panels[1]))/panels[1]
@@ -373,7 +373,7 @@ class Spectroscopy(object):
                 ax1.text(0.03, 0.90, "{}: {}".format(self.data['id'][inds[i]], self.data['phase'][inds[i]]), transform=ax1.transAxes, bbox={'facecolor':'w'})
                 if (i+1)%(panels[0]*panels[1]) == 0:
                     pylab.draw()
-                    raw_input("Press enter to move to the next plot")
+                    input("Press enter to move to the next plot")
                 elif i == len(inds)-1:
                     pylab.draw()
         return
@@ -411,7 +411,7 @@ class Spectroscopy(object):
         else:
             fig = pylab.gcf()
         if panels is None:
-            for i in xrange(len(inds)):
+            for i in range(len(inds)):
                 fig.clf()
                 ax1 = fig.add_axes([0.05,0.05,0.92,0.93])
                 ax1.plot(wave_model, flux_model[i], 'k-')
@@ -419,7 +419,7 @@ class Spectroscopy(object):
                 ax1.set_xlim([wave_model[0],wave_model[-1]])
                 ax1.text(0.03, 0.90, "{}: {}".format(self.data['id'][inds[i]], self.data['phase'][inds[i]]), transform=ax1.transAxes, bbox={'facecolor':'w'})
                 pylab.draw()
-                raw_input("Press enter to move to the next plot")
+                input("Press enter to move to the next plot")
         else:
             llim = 0.05
             blim = 0.05
@@ -430,7 +430,7 @@ class Spectroscopy(object):
             split_ratio = 0.3
             w = (wlim - (panels[0]-1)*colspace)/panels[0]
             h = (hlim - (panels[1]-1)*rowspace)/panels[1]
-            for i in xrange(len(inds)):
+            for i in range(len(inds)):
                 if i%(panels[0]*panels[1]) == 0:
                     fig.clf()
                 col = (i%(panels[0]*panels[1]))/panels[1]
@@ -442,7 +442,7 @@ class Spectroscopy(object):
                 ax1.text(0.03, 0.90, "{}: {}".format(self.data['id'][inds[i]], self.data['phase'][inds[i]]), transform=ax1.transAxes, bbox={'facecolor':'w'})
                 if (i+1)%(panels[0]*panels[1]) == 0:
                     pylab.draw()
-                    raw_input("Press enter to move to the next plot")
+                    input("Press enter to move to the next plot")
                 elif i == len(inds)-1:
                     pylab.draw()
         return
@@ -771,7 +771,7 @@ def Rebin(flux, x, xnew, interpolate=True):
     else:
         if np.ndim(flux) == 2:
             newflux = np.empty((np.shape[0],xnew.shape[0]))
-            for i in xrange(len(flux)):
+            for i in range(len(flux)):
                 newflux[i] = Utils.Series.Interp_integrate(flux[i], x[i], xnew[i])
         else:
             newflux = Utils.Series.Interp_integrate(flux, x, xnew)

@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE
-from __future__ import print_function, division
+
 
 __all__ = ["AtmoGrid", "AtmoGridPhot", "AtmoGridDoppler", "AtmoGridSpec", "Vstack", "Atmo_grid"]
 
@@ -95,7 +95,7 @@ class AtmoGrid(Column):
                         self.cols = TableColumns([ Column(name=col[0], data=col[1]) if isinstance(col, (list,tuple)) else col for col in cols ])
                     except:
                         raise ValueError('Cannot make a TableColumns out of the provided cols parameter.')
-            shape = tuple(col.size for col in self.cols.itervalues())
+            shape = tuple(col.size for col in self.cols.values())
             if self.shape != shape:
                 raise ValueError('The dimension of the data grid and the cols are not matching.')
         return self
@@ -125,7 +125,7 @@ class AtmoGrid(Column):
 
     @property
     def colnames(self):
-        return self.cols.keys()
+        return list(self.cols.keys())
 
     def copy(self, order='C', data=None, copy_data=True):
         """
@@ -402,7 +402,7 @@ class AtmoGrid(Column):
         flux = f['flux'].value
 
         meta = {}
-        for key_attrs, val_attrs in f.attrs.iteritems():
+        for key_attrs, val_attrs in f.attrs.items():
             meta[key_attrs] = val_attrs
         colnames = meta.pop('colnames')
         name = meta.pop('name')
@@ -412,7 +412,7 @@ class AtmoGrid(Column):
         grp = f['cols']
         for col in colnames:
             dset = grp[col]
-            cols.append( Column(data=dset.value, name=col, meta=dict(dset.attrs.iteritems())) )
+            cols.append( Column(data=dset.value, name=col, meta=dict(iter(dset.attrs.items()))) )
         cols = TableColumns(cols)
 
         f.close()
@@ -497,18 +497,18 @@ class AtmoGrid(Column):
         f = h5py.File(fln, 'w')
 
         f.create_dataset(name='flux', data=self.data)
-        f.attrs['colnames'] = self.cols.keys()
+        f.attrs['colnames'] = list(self.cols.keys())
         f.attrs['name'] = self.name
         f.attrs['description'] = self.description
 
-        for key_attrs, val_attrs in self.meta.iteritems():
+        for key_attrs, val_attrs in self.meta.items():
             f.attrs[key_attrs] = val_attrs
 
         grp = f.create_group('cols')
-        for key, val in self.cols.iteritems():
+        for key, val in self.cols.items():
             dset = grp.create_dataset(name=key, data=val)
             if hasattr(val, 'meta'):
-                for key_attrs, val_attrs in val.meta.iteritems():
+                for key_attrs, val_attrs in val.meta.items():
                     dset.attrs[key_attrs] = val_attrs
         f.close()
 

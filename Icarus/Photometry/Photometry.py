@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE
-from __future__ import print_function, division
+
 
 __all__ = ["Photometry"]
 
@@ -238,8 +238,8 @@ class Photometry(object):
         """
         ## Extract the DM and AV from the parameter list.
         if isinstance(par, dict):
-            DM = par['dm'] if 'dm' in par.keys() else 0.
-            AV = par['av'] if 'av' in par.keys() else 0.
+            DM = par['dm'] if 'dm' in list(par.keys()) else 0.
+            AV = par['av'] if 'av' in list(par.keys()) else 0.
         else:
             DM = par[-2] if len(par) == 10 else 0.
             AV = par[-1] if len(par) == 10 else 0.
@@ -286,8 +286,8 @@ class Photometry(object):
 
         ## Putting back the updated DM and AV from the parameter list.
         if isinstance(par, dict):
-            if 'dm' in par.keys(): par['dm'] = DM
-            if 'av' in par.keys(): par['av'] = AV
+            if 'dm' in list(par.keys()): par['dm'] = DM
+            if 'av' in list(par.keys()): par['av'] = AV
         else:
             if len(par) == 10: par[-2] = DM
             if len(par) == 10: par[-1] = AV
@@ -352,12 +352,12 @@ class Photometry(object):
         ## Extract the DM and AV from the parameter list.
         if DM is None:
             if isinstance(par, dict):
-                DM = par['dm'] if 'dm' in par.keys() else 0.
+                DM = par['dm'] if 'dm' in list(par.keys()) else 0.
             else:
                 DM = par[-2] if len(par) == 10 else 0.
         if AV is None:
             if isinstance(par, dict):
-                AV = par['av'] if 'av' in par.keys() else 0.
+                AV = par['av'] if 'av' in list(par.keys()) else 0.
             else:
                 AV = par[-1] if len(par) == 10 else 0.
         offsets = self.data['ext']*AV + DM
@@ -436,12 +436,12 @@ class Photometry(object):
         ## Extract the DM and AV from the parameter list.
         if DM is None:
             if isinstance(par, dict):
-                DM = par['dm'] if 'dm' in par.keys() else 0.
+                DM = par['dm'] if 'dm' in list(par.keys()) else 0.
             else:
                 DM = par[-2] if len(par) == 10 else 0.
         if AV is None:
             if isinstance(par, dict):
-                AV = par['av'] if 'av' in par.keys() else 0.
+                AV = par['av'] if 'av' in list(par.keys()) else 0.
             else:
                 AV = par[-1] if len(par) == 10 else 0.
         offsets = self.data['ext']*AV + DM
